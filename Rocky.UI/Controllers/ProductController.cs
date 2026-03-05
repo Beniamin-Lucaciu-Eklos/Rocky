@@ -6,19 +6,22 @@ using System.Threading.Tasks;
 
 namespace Rocky.UI.Controllers
 {
-    public class CategoryController : Controller
+    public class ProductController : Controller
     {
         private readonly ApplicationDbContext _db;
 
-        public CategoryController(ApplicationDbContext db)
+        public ProductController(ApplicationDbContext db)
         {
             _db = db;
         }
 
         public async Task<IActionResult> Index()
         {
-            IEnumerable<Category> categories = await _db.Categories.ToListAsync();
-            return View(categories);
+            IEnumerable<Product> products = await _db.Products
+                .Include(nameof(Product))
+                .ToListAsync();
+
+            return View(products);
         }
 
         public IActionResult Create()
@@ -28,12 +31,12 @@ namespace Rocky.UI.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Category category)
+        public async Task<IActionResult> Create(Product product)
         {
             if (!ModelState.IsValid)
-                return View(category);
+                return View(product);
 
-            await _db.Categories.AddAsync(category);
+            await _db.Products.AddAsync(product);
             await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
@@ -43,21 +46,21 @@ namespace Rocky.UI.Controllers
             if (id == null || id == 0)
                 return NotFound();
 
-            var category = await _db.Categories.FirstOrDefaultAsync(x => x.Id == id);
-            if (category is null)
+            var product = await _db.Products.FirstOrDefaultAsync(x => x.Id == id);
+            if (product is null)
                 return NotFound();
 
-            return View(category);
+            return View(product);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Category category)
+        public async Task<IActionResult> Edit(Product product)
         {
             if (!ModelState.IsValid)
-                return View(category);
+                return View(product);
 
-            _db.Categories.Update(category);
+            _db.Products.Update(product);
             await _db.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
@@ -68,11 +71,11 @@ namespace Rocky.UI.Controllers
             if (id == null || id == 0)
                 return NotFound();
 
-            var category = await _db.Categories.FirstOrDefaultAsync(x => x.Id == id);
-            if (category is null)
+            var product = await _db.Products.FirstOrDefaultAsync(x => x.Id == id);
+            if (product is null)
                 return NotFound();
 
-            return View(category);
+            return View(product);
         }
 
         [HttpPost]
@@ -82,11 +85,11 @@ namespace Rocky.UI.Controllers
             if (id == null || id == 0)
                 return NotFound();
 
-            var category = await _db.Categories.FirstOrDefaultAsync(x => x.Id == id);
-            if (category is null)
+            var product = await _db.Products.FirstOrDefaultAsync(x => x.Id == id);
+            if (product is null)
                 return NotFound();
 
-            _db.Categories.Remove(category);
+            _db.Products.Remove(product);
             await _db.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));

@@ -1,0 +1,35 @@
+﻿@model ApplicationType
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<form method="post" asp-action="DeletePost">
+    <input asp-for="Id" hidden />
+    <div class="border p-3">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group row">
+            <h2 class="text-info pl-3">
+                Delete Application Type
+            </h2>
+        </div>
+
+        <div class="mb-3 row">
+            <label asp-for="Name" class="col-sm-2 col-form-label">Name</label>
+            <div class="col-sm-10">
+                <input asp-for="Name" class="form-control" disabled>
+            </div>
+        </div>
+
+        <div class="mb-3 row">
+            <div class="col-sm-6">
+                <input type="submit" class="btn btn-info w-100 text-danger" value="Delete" />
+            </div>
+
+            <div class="col-sm-6">
+                <a asp-action="Index" class="btn btn-success w-100">
+                    <i class="fa-solid fa-circle-arrow-left"></i> Back
+                </a>
+            </div>
+        </div>
+    </div>
+</form>

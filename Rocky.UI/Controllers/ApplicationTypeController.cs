@@ -6,19 +6,19 @@ using System.Threading.Tasks;
 
 namespace Rocky.UI.Controllers
 {
-    public class CategoryController : Controller
+    public class ApplicationTypeController : Controller
     {
         private readonly ApplicationDbContext _db;
 
-        public CategoryController(ApplicationDbContext db)
+        public ApplicationTypeController(ApplicationDbContext db)
         {
             _db = db;
         }
 
         public async Task<IActionResult> Index()
         {
-            IEnumerable<Category> categories = await _db.Categories.ToListAsync();
-            return View(categories);
+            IEnumerable<ApplicationType> applicationTypes = await _db.ApplicationTypes.ToListAsync();
+            return View(applicationTypes);
         }
 
         public IActionResult Create()
@@ -28,13 +28,14 @@ namespace Rocky.UI.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Category category)
+        public async Task<IActionResult> Create(ApplicationType applicationType)
         {
             if (!ModelState.IsValid)
-                return View(category);
+                return View(applicationType);
 
-            await _db.Categories.AddAsync(category);
+            await _db.ApplicationTypes.AddAsync(applicationType);
             await _db.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -43,21 +44,21 @@ namespace Rocky.UI.Controllers
             if (id == null || id == 0)
                 return NotFound();
 
-            var category = await _db.Categories.FirstOrDefaultAsync(x => x.Id == id);
-            if (category is null)
+            var applicationType = await _db.ApplicationTypes.FirstOrDefaultAsync(x => x.Id == id);
+            if (applicationType is null)
                 return NotFound();
 
-            return View(category);
+            return View(applicationType);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Category category)
+        public async Task<IActionResult> Edit(ApplicationType applicationType)
         {
             if (!ModelState.IsValid)
-                return View(category);
+                return View(applicationType);
 
-            _db.Categories.Update(category);
+            _db.ApplicationTypes.Update(applicationType);
             await _db.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
@@ -68,11 +69,11 @@ namespace Rocky.UI.Controllers
             if (id == null || id == 0)
                 return NotFound();
 
-            var category = await _db.Categories.FirstOrDefaultAsync(x => x.Id == id);
-            if (category is null)
+            var applicationType = await _db.ApplicationTypes.FirstOrDefaultAsync(x => x.Id == id);
+            if (applicationType is null)
                 return NotFound();
 
-            return View(category);
+            return View(applicationType);
         }
 
         [HttpPost]
@@ -82,11 +83,11 @@ namespace Rocky.UI.Controllers
             if (id == null || id == 0)
                 return NotFound();
 
-            var category = await _db.Categories.FirstOrDefaultAsync(x => x.Id == id);
-            if (category is null)
+            var applicationType = await _db.ApplicationTypes.FirstOrDefaultAsync(x => x.Id == id);
+            if (applicationType is null)
                 return NotFound();
 
-            _db.Categories.Remove(category);
+            _db.ApplicationTypes.Remove(applicationType);
             await _db.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
