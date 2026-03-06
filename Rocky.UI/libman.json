@@ -5,6 +5,14 @@
     {
       "library": "font-awesome@7.0.1",
       "destination": "wwwroot/lib/fontawesome/font-awesome/"
+    },
+    {
+      "library": "sweetalert2@11.23.0",
+      "destination": "wwwroot/lib/sweetalert2/"
+    },
+    {
+      "library": "summernote@0.9.1",
+      "destination": "wwwroot/lib/summernote/"
     }
   ]
 }
