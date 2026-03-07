@@ -1,83 +1,103 @@
 ﻿@model ProductViewModel
 @{
     ViewData["Title"] = "Save";
-    var isEditAction = Model is { Product: { Id: > 0 } };
+    var isEditAction = Model.IsEditMode;
     var title = isEditAction ? "Edit" : "Create";
-    var productEntry = Model.Product;
 }
 
-<form method="post" asp-action="Save" enctype="multipart/form-data">
+<form method="post" asp-action="Save"
+      enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
     @if (isEditAction)
     {
-        <input asp-for="@productEntry.Id" hidden />
+        <input asp-for="@Model.Product.Id" hidden />
     }
 
     <div class="border p-3">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
         <div class="form-group row">
             <h2 class="text-info pl-3">
                 @title
             </h2>
         </div>
 
-        <div class="mb-3 row">
-            <label asp-for="@productEntry.Name" class="col-sm-2 col-form-label">Name</label>
-            <div class="col-sm-10">
-                <input asp-for="@productEntry.Name" class="form-control">
-                <span asp-validation-for="@productEntry.Name" class="text-danger" />
-            </div>
-        </div>
+        <div class="row">
+            <div class="col-8">
 
-        <div class="mb-3 row">
-            <label asp-for="@productEntry.Price" class="col-sm-2 col-form-label">Price</label>
-            <div class="col-sm-10">
-                <input asp-for="@productEntry.Price" class="form-control">
-                <span asp-validation-for="@productEntry.Price" class="text-danger" />
-            </div>
-        </div>
+                <div class="mb-3 row">
+                    <label asp-for="@Model.Product.Name" class="col-sm-2 col-form-label">Name</label>
+                    <div class="col-sm-10">
+                        <input asp-for="@Model.Product.Name" class="form-control">
+                        <span asp-validation-for="@Model.Product.Name" class="text-danger" />
+                    </div>
+                </div>
 
-        <div class="mb-3 row">
-            <label asp-for="@productEntry.Description" class="col-sm-2 col-form-label">Description</label>
-            <div class="col-sm-10">
-                <textarea asp-for="@productEntry.Description" class="form-control summernote"></textarea>
-                <span asp-validation-for="@productEntry.Description" class="text-danger" />
-            </div>
-        </div>
+                <div class="mb-3 row">
+                    <label asp-for="@Model.Product.Price" class="col-sm-2 col-form-label">Price</label>
+                    <div class="col-sm-10">
+                        <input asp-for="@Model.Product.Price" class="form-control">
+                        <span asp-validation-for="@Model.Product.Price" class="text-danger" />
+                    </div>
+                </div>
 
-        <div class="mb-3 row">
-            <label class="col-sm-2 col-form-label">Image</label>
-            <div class="col-sm-10">
-                <input type="file" name="files" id="uploadBox" multiple class="form-control">
-            </div>
-        </div>
+                <div class="mb-3 row">
+                    <label asp-for="@Model.Product.Description" class="col-sm-2 col-form-label">Description</label>
+                    <div class="col-sm-10">
+                        <textarea asp-for="@Model.Product.Description" class="form-control summernote"></textarea>
+                        <span asp-validation-for="@Model.Product.Description" class="text-danger" />
+                    </div>
+                </div>
 
-        <div class="mb-3 row">
-            <label asp-for="@productEntry.CategoryId" class="col-sm-2 col-form-label">Category</label>
-            <div class="col-sm-10">
-                <select asp-for="@productEntry.CategoryId" asp-items="@Model.Categories" class="form-control">
-                    <option selected>--Select category--</option>
-                </select>
-                <span asp-validation-for="@productEntry.CategoryId" class="text-danger" />
-            </div>
-        </div>
+                <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label">Image</label>
+                    <div class="col-sm-10">
+                        <input type="file" name="files" id="uploadBox" multiple class="form-control">
+                    </div>
+                </div>
 
-        <div class="mb-3 row">
-            <div class="col-sm-6">
-                @if (isEditAction)
+                <div class="mb-3 row">
+                    <label asp-for="@Model.Product.CategoryId" class="col-sm-2 col-form-label">Category</label>
+                    <div class="col-sm-10">
+                        <select asp-for="@Model.Product.CategoryId" asp-items="@Model.Categories" class="form-control">
+                            <option selected>--Select category--</option>
+                        </select>
+                        <span asp-validation-for="@Model.Product.CategoryId" class="text-danger" />
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="col-sm-6">
+                        @if (isEditAction)
+                        {
+                            <input type="submit" class="btn btn-info w-100" value="@title" />
+                        }
+                        else
+                        {
+                            <input type="submit" class="btn btn-info w-100" onclick="return validateInput();" value="@title" />
+                        }
+                    </div>
+
+                    <div class="col-sm-6">
+                        <a asp-action="Index" class="btn btn-success w-100">
+                            <i class="fa-solid fa-circle-arrow-left"></i> Back
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-3 offset-1">
+                @if (Model.IsEditMode)
                 {
-                    <input type="submit" class="btn btn-info w-100" value="@title" />
+                    <img src="@WWWRootConstants.ProductImagesPath@Model.Product.Image"
+                         alt="@Model.Product.Name"
+                         title="@Model.Product.Name"
+                         width="100%" />
                 }
-                else
-                {
-                    <input type="submit" class="btn btn-info w-100" onclick="return validateInput();" value="@title" />
-                }
+
             </div>
 
-            <div class="col-sm-6">
-                <a asp-action="Index" class="btn btn-success w-100">
-                    <i class="fa-solid fa-circle-arrow-left"></i> Back
-                </a>
-            </div>
         </div>
     </div>
 </form>

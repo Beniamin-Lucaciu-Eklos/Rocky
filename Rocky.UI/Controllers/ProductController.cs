@@ -29,61 +29,91 @@ namespace Rocky.UI.Controllers
             return View(products);
         }
 
-        public IActionResult Save(int? id)
+        public async Task<IActionResult> Save(int? id)
         {
-            //IEnumerable<SelectListItem> categoryDropdown = _db.Categories.Select(x => new SelectListItem(x.Name, x.Id.ToString()));
-            //ViewBag.CategoryDropdown = categoryDropdown;
-
-            //Product product = new();
-
-            ProductViewModel productViewModel = new ProductViewModel();
-            productViewModel.Product = new Product();
-            productViewModel.Categories = _db.Categories.Select(x => new SelectListItem(x.Name, x.Id.ToString()));
+            ProductViewModel vmProduct = new ProductViewModel();
+            vmProduct.Product = new Product();
 
             if (id is not null)
             {
-                productViewModel.Product = _db.Products.FirstOrDefault(product => product.Id == id);
+                vmProduct.Product = _db.Products.Include(p => p.Category)
+                                .FirstOrDefault(product => product.Id == id);
 
-                if (productViewModel.Product is null)
+                if (vmProduct.Product is null)
                     return NotFound();
             }
 
-            return View(productViewModel);
+            await PopulateDropdowns(vmProduct);
+            return View(vmProduct);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Save(ProductViewModel vmProduct)
         {
-            if (ModelState.IsValid)
+            ModelState.Remove($"{nameof(Product)}.{nameof(Product.Image)}");
+
+            if (!ModelState.IsValid)
             {
-                var files = HttpContext.Request.Form.Files;
-                var webRoot = _webHostEnvironment.WebRootPath;
-
-
-                if (vmProduct is { Product: { Id: 0 } })
-                {
-                    string upload = _webHostEnvironment + WWWRootConstants.ProductImagesPath;
-                    string fileName = Guid.NewGuid().ToString();
-                    string extension = Path.GetExtension(files[0].FileName);
-
-                    string targetFileName = fileName + extension;
-                    using (var fileStream = new FileStream(Path.Combine(upload, targetFileName), FileMode.Create))
-                    {
-                        files[0].CopyTo(fileStream);
-                    }
-                    vmProduct.Product.Image = targetFileName;
-
-                    _db.Products.Add(vmProduct.Product);
-                    await _db.SaveChangesAsync();
-                }
-                else
-                {
-                }
+                await PopulateDropdowns(vmProduct);
+                return View(vmProduct);
             }
 
-            return View();
+            if (vmProduct.IsEditMode)
+                await Update(vmProduct);
+            else
+                await Insert(vmProduct);
+
+            return RedirectToAction(nameof(Index));
         }
+
+        private async Task PopulateDropdowns(ProductViewModel vmProduct)
+        {
+            vmProduct.Categories = await _db.Categories.Select(x => new SelectListItem(x.Name, x.Id.ToString()))
+                .ToListAsync();
+        }
+
+        private async Task Insert(ProductViewModel vmProduct)
+        {
+            var files = HttpContext.Request.Form.Files;
+            var webRoot = _webHostEnvironment.WebRootPath;
+
+            string upload = webRoot + WWWRootConstants.ProductImagesPath;
+            string fileName = Guid.NewGuid().ToString();
+            string extension = Path.GetExtension(files[0].FileName);
+
+            string targetFileName = fileName + extension;
+            using (var fileStream = new FileStream(Path.Combine(upload, targetFileName), FileMode.Create))
+            {
+                files[0].CopyTo(fileStream);
+            }
+            vmProduct.Product.Image = targetFileName;
+
+            _db.Products.Add(vmProduct.Product);
+            await _db.SaveChangesAsync();
+        }
+
+        private async Task Update(ProductViewModel vmProduct)
+        {
+            //var files = HttpContext.Request.Form.Files;
+            //var webRoot = _webHostEnvironment.WebRootPath;
+
+            //string upload = _webHostEnvironment + WWWRootConstants.ProductImagesPath;
+            //string fileName = Guid.NewGuid().ToString();
+            //string extension = Path.GetExtension(files[0].FileName);
+
+            //string targetFileName = fileName + extension;
+            //using (var fileStream = new FileStream(Path.Combine(upload, targetFileName), FileMode.Create))
+            //{
+            //    files[0].CopyTo(fileStream);
+            //}
+            //vmProduct.Product.Image = targetFileName;
+
+            //_db.Products.Add(vmProduct.Product);
+            //await _db.SaveChangesAsync();
+        }
+
+
 
         public async Task<IActionResult> Delete(int? id)
         {

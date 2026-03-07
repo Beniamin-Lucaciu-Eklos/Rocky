@@ -19,7 +19,7 @@ namespace Rocky.UI.Models
 
         public int CategoryId { get; set; }
         [ForeignKey(nameof(CategoryId))]
-        public virtual Category Category { get; set; }
+        public virtual Category? Category { get; set; }
 
     }
 }
