@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Rocky.UI.Data;
 
@@ -10,9 +11,11 @@ using Rocky.UI.Data;
 namespace Rocky.UI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260309190915_addApplicationTypeToProduct")]
+    partial class addApplicationTypeToProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,7 +69,7 @@ namespace Rocky.UI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ApplicationTypeId")
+                    b.Property<int?>("ApplicationTypeId")
                         .HasColumnType("int");
 
                     b.Property<int>("CategoryId")
@@ -86,10 +89,6 @@ namespace Rocky.UI.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
-                    b.Property<string>("ShortDescription")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationTypeId");
@@ -103,9 +102,7 @@ namespace Rocky.UI.Migrations
                 {
                     b.HasOne("Rocky.UI.Models.ApplicationType", "ApplicationType")
                         .WithMany()
-                        .HasForeignKey("ApplicationTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ApplicationTypeId");
 
                     b.HasOne("Rocky.UI.Models.Category", "Category")
                         .WithMany()

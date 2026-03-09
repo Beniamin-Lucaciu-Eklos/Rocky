@@ -1,21 +1,32 @@
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Rocky.UI.Data;
 using Rocky.UI.Models;
+using Rocky.UI.ViewModels;
 
 namespace Rocky.UI.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _db;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext db)
         {
             _logger = logger;
+            _db = db;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var vmHome = new HomeViewModel();
+            vmHome.Products = _db.Products
+                .Include(p => p.Category)
+                .Include(p => p.ApplicationType);
+            vmHome.Categories = _db.Categories;
+            return View(vmHome);
         }
 
         public IActionResult Privacy()
